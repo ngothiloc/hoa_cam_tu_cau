@@ -72,7 +72,7 @@ function focusPhoto(i) {
   selected = i;
   stage.focus(i);
   const m = memories[i];
-  $("#photo-number").textContent = `KỶ NIỆM 0${i + 1} / 04`;
+  //   $("#photo-number").textContent = `KỶ NIỆM 0${i + 1} / 04`;
   $("#photo-count").textContent = `0${i + 1} / 04`;
   $("#photo-preview").src = m.src;
   $("#photo-preview").alt = m.title;
