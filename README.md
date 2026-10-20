@@ -5,8 +5,10 @@ Mã nguồn website nằm trong `blue-hour/`. Repository Git được quản lý
 ## Deploy lên Vercel
 
 1. Push repository lên GitHub và import repository vào Vercel.
-2. Giữ **Root Directory** ở gốc repository (`./`), chọn **Framework Preset: Other**.
-3. Nhấn **Deploy**. File `vercel.json` đã cấu hình phục vụ `blue-hour/dist`, không cần cài dependency hoặc build.
+2. Chọn **Framework Preset: Other**. **Root Directory** có thể là gốc repository (`./`) hoặc `blue-hour`.
+3. Nhấn **Deploy**. Cả hai thư mục đều có `vercel.json`: ở gốc phục vụ `blue-hour/dist`, ở `blue-hour` phục vụ `dist`. Không cần cài dependency hoặc build.
+
+Nếu trang chủ báo 404 nhưng `/dist/index.html` mở được, hãy deploy commit mới nhất có `blue-hour/vercel.json`.
 
 Những lần cập nhật tiếp theo, commit và push lên nhánh đã kết nối để Vercel deploy lại.
 
