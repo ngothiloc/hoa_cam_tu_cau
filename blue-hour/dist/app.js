@@ -24,40 +24,6 @@ const memories = [
     src: "assets/IMG_3110.JPG",
   },
 ];
-let db;
-const dbReady = new Promise((resolve) => {
-  try {
-    const req = indexedDB.open("blue-hour-memories", 1);
-    req.onupgradeneeded = () => req.result.createObjectStore("photos");
-    req.onsuccess = () => {
-      db = req.result;
-      resolve(db);
-    };
-    req.onerror = () => resolve(null);
-  } catch {
-    resolve(null);
-  }
-});
-const getStored = async (id) => {
-  await dbReady;
-  if (!db) return null;
-  return new Promise((resolve) => {
-    const r = db.transaction("photos").objectStore("photos").get(id);
-    r.onsuccess = () => resolve(r.result);
-    r.onerror = () => resolve(null);
-  });
-};
-const saveStored = async (id, data) => {
-  await dbReady;
-  if (!db) throw Error("storage");
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction("photos", "readwrite");
-    tx.objectStore("photos").put(data, id);
-    tx.oncomplete = resolve;
-    tx.onerror = reject;
-    tx.onabort = reject;
-  });
-};
 let toastTimer;
 function toast(message) {
   $("#toast").textContent = message;
@@ -127,70 +93,17 @@ stage.onPhoto = focusPhoto;
 $("#close-photo").onclick = closePhoto;
 $("#previous").onclick = () => focusPhoto((selected + 3) % 4);
 $("#next").onclick = () => focusPhoto((selected + 1) % 4);
-$("#replace-photo").onclick = () => $("#upload").click();
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closePhoto();
 });
 stage.renderer.domElement.addEventListener("dblclick", closePhoto);
-$("#upload").onchange = async (e) => {
-  const file = e.target.files?.[0];
-  e.target.value = "";
-  if (!file || selected < 0) return;
-  const id = selected;
-  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-    toast("Hãy chọn ảnh JPG, PNG hoặc WebP.");
-    return;
-  }
-  if (file.size > 20 * 1024 * 1024) {
-    toast("Hãy chọn ảnh nhỏ hơn 20 MB.");
-    return;
-  }
-  $("#replace-photo").disabled = true;
-  let url;
-  try {
-    url = URL.createObjectURL(file);
-    const img = new Image();
-    img.src = url;
-    await img.decode();
-    const c = document.createElement("canvas");
-    const scale = Math.min(1, 1400 / Math.max(img.width, img.height));
-    c.width = Math.max(1, Math.round(img.width * scale));
-    c.height = Math.max(1, Math.round(img.height * scale));
-    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-    const data = c.toDataURL("image/jpeg", 0.88);
-    const texture = await photoTexture(data);
-    stage.photoMaterials[id].map?.dispose();
-    stage.photoMaterials[id].map = texture;
-    stage.photoMaterials[id].needsUpdate = true;
-    memories[id].src = data;
-    memories[id].custom = true;
-    if (selected === id) $("#photo-preview").src = data;
-    try {
-      await saveStored(id, data);
-      toast("Đã đặt ảnh của bạn vào bó hoa ♡");
-    } catch {
-      toast("Ảnh đã thay; trình duyệt không cho phép lưu lâu dài.");
-    }
-  } catch {
-    toast("Không đọc được ảnh này. Hãy thử một ảnh khác.");
-  } finally {
-    if (url) URL.revokeObjectURL(url);
-    $("#replace-photo").disabled = false;
-  }
-};
-
 await Promise.all(
   memories.map(async (m, i) => {
-    const stored = await getStored(i);
-    if (stored) {
-      m.src = stored;
-      m.custom = true;
-    }
     try {
       stage.photoMaterials[i].map = await photoTexture(m.src);
       stage.photoMaterials[i].needsUpdate = true;
     } catch {
-      toast("Một ảnh chưa tải được. Bạn có thể thay bằng ảnh của mình.");
+      toast("Một ảnh chưa tải được. Vui lòng tải lại trang.");
     }
   }),
 );
