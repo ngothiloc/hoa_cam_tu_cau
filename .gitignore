@@ -1,0 +1,10 @@
+.local-backups/
+.vercel/
+.DS_Store
+node_modules/
+*.tar.gz
+qa-*.png
+qa-*.mjs
+.env
+.env.*
+!.env.example

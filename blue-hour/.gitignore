@@ -1,0 +1,6 @@
+node_modules/
+.openai/local/
+qa-*.png
+qa-*.mjs
+*.tar.gz
+.DS_Store

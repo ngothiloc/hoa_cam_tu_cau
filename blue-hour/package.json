@@ -1,0 +1,10 @@
+{
+  "name": "blue-hour-bouquet",
+  "version": "2.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 4173 --directory dist",
+    "check": "node --check dist/app.js && node --check dist/bouquet.js && node --check dist/stage.js && node --check dist/motion.js && node --check dist/fairy-lights.js"
+  }
+}
